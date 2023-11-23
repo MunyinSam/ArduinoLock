@@ -1,4 +1,6 @@
-
+/*Door lock system code
+ * https://srituhobby.com
+ */
  
 #include <Servo.h>
 #include <LiquidCrystal_I2C.h>
@@ -7,7 +9,9 @@
 
 #define SS_PIN 10
 #define RST_PIN 9
-String UID = "13 FF 1 1D";
+String UID = "93 3E 0A 94";
+String Second_UID = "13 FF 01 1D";
+
 byte lock = 0;
 
 Servo servo;
@@ -26,8 +30,8 @@ void setup() {
 }
 
 void loop() {
-  lcd.setCursor(4, 0);
-  lcd.print("Welcome!");
+  lcd.setCursor(1, 0);
+  lcd.print("Door Lock Program");
   lcd.setCursor(1, 1);
   lcd.print("Put your card");
 
@@ -39,7 +43,7 @@ void loop() {
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Scanning");
-  Serial.print("NUID tag is :");
+  //Serial.print("NUID tag is :");
   String ID = "";
   for (byte i = 0; i < rfid.uid.size; i++) {
     lcd.print(".");
@@ -48,20 +52,32 @@ void loop() {
     delay(300);
   }
   ID.toUpperCase();
+  //Serial.println(ID.substring(1)); just to check
 
-  if (ID.substring(1) == UID && lock == 0 ) {
+  if ((ID.substring(1) == UID || ID.substring(1) == Second_UID) && lock == 0 ) {
     servo.write(70);
     lcd.clear();
-    lcd.setCursor(0, 0);
+    lcd.setCursor(1, 0);
+    lcd.print("UID user : ");
+    lcd.setCursor(1, 2);
     lcd.print("Door is locked");
+    
+    
+    lcd.setCursor(1, 4);
+    lcd.print(ID.substring(1));
     delay(1500);
     lcd.clear();
     lock = 1;
-  } else if (ID.substring(1) == UID && lock == 1 ) {
+  } else if ((ID.substring(1) == UID || ID.substring(1) == Second_UID) && lock == 1 ) {
     servo.write(160);
     lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Door is open");
+    lcd.setCursor(1, 0);
+    lcd.print("UID user : ");
+    lcd.setCursor(1, 2);
+    lcd.print("Door is unlocked");
+    
+    lcd.setCursor(1, 4);
+    lcd.print(ID.substring(1));
     delay(1500);
     lcd.clear();
     lock = 0;
